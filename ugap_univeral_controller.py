@@ -28,6 +28,7 @@ def test_options(option, opt_str, value, parser):
         sys.exit()
 
 def parse_config_file(config_file):
+    
     datasets = ()
     infile = open(config_file, "U")
     for line in infile:
@@ -39,6 +40,16 @@ def parse_config_file(config_file):
     return datasets
 
 def send_jobs(datasets,my_mem,controller,queue):
+    import subprocess
+    import logging
+    import re
+    
+    current_time=strftime("%Y%m%d%H%M%S") # use this to create file name
+    log_file_name="run_"+current_time+".log"
+
+    logging.basicConfig(filename=log_file_name,format='%(asctime)s %(message)s',datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
+    
+
     for data in datasets:
         if controller == "slurm":
             output, input = popen2('sbatch')
@@ -63,6 +74,17 @@ def send_jobs(datasets,my_mem,controller,queue):
 
             print job_string
             print output.read()
+            #-- adding subprocess
+
+            logging.debug("Command used is %s" %(job_string)) #print that in the log
+            
+            proc = subprocess.Popen(['sbatch'],stderr=subprocess.PIPE,stdout=subprocess.PIPE,stdin=subprocess.PIPE)
+            std_out=proc.communicate(input=job_string)
+
+            job_info=re.split('\s+',std_out[0]) # SLURM job id
+            logging.debug("Job number is %s" %(job_info[3]))
+            ##--Sanjeev's end
+            
         elif controller == "torque":
             memory = "mem=%s" % my_mem
             processors = "nodes=1:ppn=%s" % data[7]
