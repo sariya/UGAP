@@ -52,7 +52,9 @@ def send_jobs(datasets,my_mem,controller,queue):
 
     for data in datasets:
         if controller == "slurm":
-            output, input = popen2('sbatch')
+            #output, input = popen2('sbatch') -- not using popen2
+            
+            proc = subprocess.Popen(['sbatch'],stderr=subprocess.PIPE,stdout=subprocess.PIPE,stdin=subprocess.PIPE)
         else:
             output, input = popen2('qsub')
         job_name = "UGAP_%s" % data[0]
@@ -78,7 +80,6 @@ def send_jobs(datasets,my_mem,controller,queue):
 
             logging.debug("Command used is %s" %(job_string)) #print that in the log
             
-            proc = subprocess.Popen(['sbatch'],stderr=subprocess.PIPE,stdout=subprocess.PIPE,stdin=subprocess.PIPE)
             std_out=proc.communicate(input=job_string)
 
             job_info=re.split('\s+',std_out[0]) # SLURM job id
