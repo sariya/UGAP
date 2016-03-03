@@ -45,7 +45,7 @@ def send_jobs(datasets,my_mem,controller,queue):
     import re
     
     current_time=strftime("%Y%m%d%H%M%S") # use this to create file name
-    log_file_name="run_"+current_time+".log"
+    log_file_name="ugap_run_"+current_time+".log"
 
     logging.basicConfig(filename=log_file_name,format='%(asctime)s %(message)s',datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
     
